@@ -13,7 +13,7 @@ pub fn router() -> Router<InertiaConfig> {
 
 async fn index(i: Inertia) -> impl IntoResponse {
     i.render(
-        "Home",
+        "Dashboard",
         json!({
             "message": "Welcome to Axum Inertia MVC with Views Structure",
         }),
