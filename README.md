@@ -18,6 +18,7 @@ This project is organized as a Rust workspace with multiple crates:
 - **MVC Architecture**: Follows the Model-View-Controller pattern for clean code organization
 - **Database Integration**: Uses SQLx for type-safe PostgreSQL interactions
 - **API Endpoints**: RESTful API design with JSON responses
+- **Docker Development**: Fully containerized development environment with live reload
 
 ## Prerequisites
 
@@ -64,24 +65,16 @@ curl -X POST http://localhost:8000/api/jobs/email \
   -d '{"to":"user@example.com","subject":"Test Email","body":"This is a test email."}'
 ```
 
-## Docker Deployment
+## Docker Development & Deployment
 
-### Production
-
-To run the application in production mode:
-
-```bash
-docker-compose --profile prod up -d
-```
-
-This will build and run the app and worker services using the production Dockerfiles.
+This project is fully containerized for both development and production environments.
 
 ### Development with Live Reload
 
-For development with live reload (changes to your code will automatically rebuild and restart the services):
+The recommended way to develop this application is using Docker with live reload:
 
 ```bash
-# Start the development container
+# Start the development container and database
 docker-compose --profile dev up -d
 
 # Access the development container shell
@@ -101,12 +94,24 @@ cd /app && cargo watch -x 'run --bin worker' -w worker/src
 cd /app/app && npm run dev
 ```
 
-This setup provides:
-- Live reload for the Rust backend (using cargo-watch)
-- Hot module replacement for the React frontend (using Vite)
-- Shared volume mounts so you can edit code on your host machine
-- Automatic database migrations and seeding
-- A unified development environment for both app and worker
+#### Development Environment Features
+
+- **Live Reload**: Changes to Rust code automatically trigger recompilation and restart
+- **Hot Module Replacement**: Frontend changes update in real-time without full page reloads
+- **Shared Volume**: Edit code on your host machine, changes reflect immediately in the container
+- **Unified Environment**: Consistent development environment for all team members
+- **Database Integration**: PostgreSQL with TimescaleDB and vectorizer worker included
+- **Automatic Migrations**: Database schema is automatically created and seeded
+
+### Production Deployment
+
+To run the application in production mode:
+
+```bash
+docker-compose --profile prod up -d
+```
+
+This builds and runs the optimized production containers for both the app and worker services.
 
 ## Component Documentation
 
