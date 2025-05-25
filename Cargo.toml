@@ -4,13 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = { version = "0.8.4", features = ["macros"] }
+axum = "0.8.4"
 axum-inertia = "0.8.1"
-tokio = { version = "1.36.0", features = ["full"] }
-tower = "0.4.13"
-tower-http = { version = "0.5.2", features = ["fs", "trace"] }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.114"
+tokio = { version = "1.45.0", features = ["full"] }
+tower-http = { version = "0.5.2", features = ["fs", "trace"] }
+dotenv = "0.15.0"
+sqlx = { version = "0.8.3", features = ["runtime-tokio-rustls", "postgres", "macros", "time", "uuid", "json", "migrate"] }
+time = { version = "0.3.34", features = ["serde"] }
+uuid = { version = "1.7.0", features = ["v4", "serde"] }
+thiserror = "1.0.58"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 
 [dev-dependencies]
 cargo-watch = "8.5.2"
