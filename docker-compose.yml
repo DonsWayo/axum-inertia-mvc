@@ -25,7 +25,21 @@ services:
       db:
         condition: service_healthy
 
-  # Our custom background worker service using graphile_worker
+  # Production services
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles: ["prod"]
+
   worker:
     build:
       context: .
@@ -36,6 +50,26 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    profiles: ["prod"]
+
+  # Development environment with live reload
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"  # App server
+      - "3000:3000"  # Vite dev server
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["dev"]
+    tty: true
+    stdin_open: true
 
 volumes:
   data:

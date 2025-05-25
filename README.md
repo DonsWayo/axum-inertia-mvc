@@ -66,9 +66,47 @@ curl -X POST http://localhost:8000/api/jobs/email \
 
 ## Docker Deployment
 
+### Production
+
+To run the application in production mode:
+
 ```bash
-docker-compose up -d
+docker-compose --profile prod up -d
 ```
+
+This will build and run the app and worker services using the production Dockerfiles.
+
+### Development with Live Reload
+
+For development with live reload (changes to your code will automatically rebuild and restart the services):
+
+```bash
+# Start the development container
+docker-compose --profile dev up -d
+
+# Access the development container shell
+docker-compose exec dev bash
+```
+
+Once inside the container, you can run the app and worker with live reload:
+
+```bash
+# In one terminal (inside the container)
+cd /app && cargo watch -x 'run --bin axum-inertia-mvc' -w app/src -i app/src/views
+
+# In another terminal (inside the container)
+cd /app && cargo watch -x 'run --bin worker' -w worker/src
+
+# For frontend development (in a third terminal inside the container)
+cd /app/app && npm run dev
+```
+
+This setup provides:
+- Live reload for the Rust backend (using cargo-watch)
+- Hot module replacement for the React frontend (using Vite)
+- Shared volume mounts so you can edit code on your host machine
+- Automatic database migrations and seeding
+- A unified development environment for both app and worker
 
 ## Component Documentation
 

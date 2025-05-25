@@ -1,0 +1,27 @@
+FROM rust:1.87-slim
+
+WORKDIR /app
+
+# Install Node.js and development tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    git && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    cargo install cargo-watch
+
+# We'll mount the entire project as a volume
+VOLUME ["/app"]
+
+# Expose ports for the app and Vite dev server
+EXPOSE 8000 3000
+
+# Default command - can be overridden in docker-compose
+CMD ["bash"]
