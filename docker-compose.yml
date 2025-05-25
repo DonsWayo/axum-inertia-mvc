@@ -25,5 +25,17 @@ services:
       db:
         condition: service_healthy
 
+  # Our custom background worker service using graphile_worker
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   data:
