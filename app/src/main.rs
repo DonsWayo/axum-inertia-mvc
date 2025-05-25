@@ -3,6 +3,7 @@ use axum_inertia::{vite, InertiaConfig};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
+use std::sync::Arc;
 
 mod routes;
 mod db;
@@ -13,6 +14,7 @@ mod services;
 struct AppState {
     db_pool: db::DbPool,
     inertia: InertiaConfig,
+    worker_service: Arc<services::worker::WorkerService>,
 }
 
 // Implement FromRef for DbPool
@@ -37,6 +39,11 @@ async fn main() {
     // Run seeds before starting the server
     db::seeds::runner::run_all_seeds(db_pool.clone()).await.expect("Failed to run seeds");
     
+    // Initialize worker service
+    let worker_service = services::worker::WorkerService::new(db_pool.clone())
+        .await
+        .expect("Failed to initialize worker service");
+    
     // Configure Inertia for development
     let inertia = vite::Development::default()
         .port(5173)
@@ -50,6 +57,7 @@ async fn main() {
     let app_state = AppState {
         db_pool,
         inertia,
+        worker_service: Arc::new(worker_service),
     };
     
     // Create router with combined state
@@ -59,6 +67,7 @@ async fn main() {
             ServeDir::new("dist/assets"),
         )
         .merge(routes::home::router())
+        .merge(routes::jobs::router())
         .with_state(app_state);
 
     // Start server
