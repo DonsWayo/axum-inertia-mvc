@@ -19,6 +19,8 @@ This project is organized as a Rust workspace with multiple crates:
 - **Database Integration**: Uses SQLx for type-safe PostgreSQL interactions
 - **API Endpoints**: RESTful API design with JSON responses
 - **Docker Development**: Fully containerized development environment with live reload
+- **AI Integration**: Built-in Ollama with Gemma model for AI capabilities
+- **Email Testing**: Integrated MailHog for email testing and development
 
 ## Prerequisites
 
@@ -102,6 +104,8 @@ cd /app/app && npm run dev
 - **Unified Environment**: Consistent development environment for all team members
 - **Database Integration**: PostgreSQL with TimescaleDB and vectorizer worker included
 - **Automatic Migrations**: Database schema is automatically created and seeded
+- **AI Integration**: Ollama with Gemma 7B model for AI capabilities
+- **Email Testing**: MailHog for capturing and viewing emails during development
 
 ### Production Deployment
 
@@ -113,12 +117,52 @@ docker-compose --profile prod up -d
 
 This builds and runs the optimized production containers for both the app and worker services.
 
+## AI and Email Testing
+
+### AI Integration with Ollama and Gemma
+
+This project includes Ollama with the Gemma 7B model for AI capabilities. The model is automatically pulled and made available to both the app and worker services.
+
+#### Using the AI Model
+
+The Ollama API is available at `http://ollama:11434` within the Docker network. You can use it from your application code with the following environment variables:
+
+```rust
+let ollama_api_url = env::var("OLLAMA_API_URL").unwrap_or_else(|_| "http://ollama:11434".to_string());
+let ollama_model = env::var("OLLAMA_MODEL").unwrap_or_else(|_| "gemma:7b".to_string());
+```
+
+#### Testing the AI Model
+
+You can test the AI model directly using curl:
+
+```bash
+curl -X POST http://localhost:11434/api/generate -d '{"model": "gemma:7b", "prompt": "Hello, how are you?"}'
+```
+
+### Email Testing with MailHog
+
+MailHog is included for email testing and development. It captures all outgoing emails and provides a web interface to view them.
+
+#### Accessing MailHog
+
+The MailHog web interface is available at [http://localhost:8025](http://localhost:8025) when the Docker environment is running.
+
+#### Sending Emails
+
+Configure your application to send emails to the MailHog SMTP server:
+
+```rust
+let smtp_host = env::var("SMTP_HOST").unwrap_or_else(|_| "mailhog".to_string());
+let smtp_port = env::var("SMTP_PORT").unwrap_or_else(|_| "1025".to_string()).parse::<u16>().unwrap_or(1025);
+```
+
 ## Component Documentation
 
-For more detailed information about each component:
+Detailed documentation for each component can be found in their respective directories:
 
-- [App Documentation](./app/README.md) - Web application details
-- [Worker Documentation](./worker/README.md) - Background job processing details
+- [Web Application Documentation](app/README.md)
+- [Worker Documentation](worker/README.md) - Background job processing details
 
 ## License
 

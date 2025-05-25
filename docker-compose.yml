@@ -1,5 +1,6 @@
 name: axum-inertia-mvc
 services:
+  # Database
   db:
     image: timescale/timescaledb-ha:pg17
     environment:
@@ -16,6 +17,7 @@ services:
       timeout: 5s
       retries: 5
   
+  # Vector database support
   vectorizer-worker:
     image: timescale/pgai-vectorizer-worker:latest
     environment:
@@ -24,6 +26,42 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    restart: unless-stopped
+
+  # AI services
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    profiles: ["ai", "dev", "prod"]
+
+  # Pull and serve Gemma model
+  gemma-setup:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    depends_on:
+      - ollama
+    command: pull gemma:7b
+    restart: on-failure
+    profiles: ["ai", "dev", "prod"]
 
   # Production services
   app:
@@ -34,9 +72,17 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      OLLAMA_API_URL: http://ollama:11434
+      OLLAMA_MODEL: gemma:7b
     depends_on:
       db:
         condition: service_healthy
+      mailhog:
+        condition: service_started
+      ollama:
+        condition: service_started
     restart: unless-stopped
     profiles: ["prod"]
 
@@ -46,9 +92,17 @@ services:
       dockerfile: worker/Dockerfile
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      OLLAMA_API_URL: http://ollama:11434
+      OLLAMA_MODEL: gemma:7b
     depends_on:
       db:
         condition: service_healthy
+      mailhog:
+        condition: service_started
+      ollama:
+        condition: service_started
     restart: unless-stopped
     profiles: ["prod"]
 
@@ -62,14 +116,23 @@ services:
       - "3000:3000"  # Vite dev server
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      OLLAMA_API_URL: http://ollama:11434
+      OLLAMA_MODEL: gemma:7b
     volumes:
       - .:/app
     depends_on:
       db:
         condition: service_healthy
+      mailhog:
+        condition: service_started
+      ollama:
+        condition: service_started
     profiles: ["dev"]
     tty: true
     stdin_open: true
 
 volumes:
   data:
+  ollama_data:
