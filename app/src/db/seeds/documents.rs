@@ -8,7 +8,7 @@ use tracing::{info, error};
 
 /// Seed the database with document data
 pub async fn seed(pool: DbPool) -> Result<(), Box<dyn Error>> {
-    let json_path = "src/data/dashboard/data.json";
+    let json_path = "app/src/data/dashboard/data.json";
     
     // Check if the file exists
     if !Path::new(json_path).exists() {
