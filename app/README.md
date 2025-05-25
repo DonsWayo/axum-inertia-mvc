@@ -1,23 +1,30 @@
-# Axum Inertia MVC
+# Axum Inertia MVC - Web Application
 
-A monolithic application built with Axum, Inertia.js, React, TailwindCSS, and PostgreSQL.
+A modern web application built with Axum, Inertia.js, React, and TailwindCSS, with background job processing capabilities.
 
 ## Project Structure
 
 ```
-axum-inertia-mvc/
+app/
 ├── src/
+│   ├── data/           # Static data files
+│   │   └── dashboard/  # Dashboard data
 │   ├── db/             # Database layer
 │   │   ├── migrations/ # Database migrations
 │   │   ├── models/     # Data models
-│   │   ├── seeds/      # Seed data
-│   │   └── repositories/ # Data access layer
-│   ├── routes/         # Route definitions
+│   │   ├── repositories/ # Data access layer
+│   │   └── seeds/      # Seed data
+│   ├── routes/         # Route definitions and API endpoints
+│   ├── services/       # Business logic and services
+│   │   └── worker/     # Worker service for job processing
 │   ├── views/          # Frontend components
-│   │   ├── pages/      # React page components
 │   │   ├── components/ # Reusable React components
-│   │   └── layouts/    # Layout components
-│   └── main.tsx        # React entry point
+│   │   │   └── ui/     # UI components
+│   │   ├── hooks/      # React hooks
+│   │   ├── layouts/    # Layout components
+│   │   ├── lib/        # Frontend utilities
+│   │   └── pages/      # React page components
+│   └── main.rs         # Application entry point
 ├── Cargo.toml          # Rust dependencies
 ├── package.json        # Node.js dependencies
 └── vite.config.ts      # Vite configuration
@@ -120,6 +127,7 @@ cargo build --release
 - **SQLx**: Type-safe SQL toolkit for Rust
 - **Database Migrations**: Automatic schema management
 - **Seeding**: Automatic data seeding for development
+- **Background Job Processing**: Integration with graphile_worker for reliable job processing
 
 ## Development Notes
 
@@ -132,3 +140,26 @@ cargo build --release
   - **Migrations**: Manage database schema changes
   - **Seeds**: Populate the database with initial data
 - PostgreSQL is used as the primary database with SQLx for type-safe queries
+
+## Background Job Processing
+
+This application integrates with a separate worker service for background job processing:
+
+- **Worker Service**: The app includes a `WorkerService` that queues jobs to be processed by the worker
+- **Job Queue API**: An API endpoint at `/api/jobs/email` allows for queueing email sending jobs
+- **PostgreSQL-based Queue**: Jobs are stored in PostgreSQL for reliability and durability
+
+### Testing Job Processing
+
+To test the job processing functionality:
+
+1. Ensure the worker service is running (`cargo run --bin worker`)
+2. Send a POST request to the email job endpoint:
+
+```bash
+curl -X POST http://localhost:8000/api/jobs/email \
+  -H "Content-Type: application/json" \
+  -d '{"to":"user@example.com","subject":"Test Email","body":"This is a test email."}'
+```
+
+3. Check the worker logs to see the job being processed
