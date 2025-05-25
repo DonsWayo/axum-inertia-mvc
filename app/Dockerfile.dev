@@ -1,0 +1,46 @@
+FROM rust:1.87-slim
+
+WORKDIR /app
+
+# Install Node.js and development tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    git && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    cargo install cargo-watch
+
+# Copy the Cargo files
+COPY Cargo.toml Cargo.lock ./
+COPY app/Cargo.toml ./app/
+COPY worker/Cargo.toml ./worker/
+
+# Copy the frontend files
+COPY app/package.json ./app/
+COPY app/vite.config.ts ./app/
+COPY app/tsconfig.json ./app/
+COPY app/tsconfig.node.json ./app/
+COPY app/components.json ./app/
+
+# Install npm dependencies
+WORKDIR /app/app
+RUN npm install
+
+# Return to the main directory
+WORKDIR /app
+
+# We'll mount the source code as a volume during development
+VOLUME ["/app/app/src"]
+
+# Expose ports for the app and Vite dev server
+EXPOSE 8000 3000
+
+# Start the development server with live reload
+CMD ["sh", "-c", "cd /app/app && npm run dev & cd /app && cargo watch -x 'run --bin axum-inertia-mvc' -w app/src -i app/src/views"]
