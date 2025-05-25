@@ -5,6 +5,12 @@ WORKDIR /app
 # Copy the Cargo files
 COPY Cargo.toml Cargo.lock ./
 COPY worker/Cargo.toml ./worker/
+COPY app/Cargo.toml ./app/
+
+# Create dummy source files for dependency caching
+RUN mkdir -p app/src worker/src && \
+    echo 'fn main() { println!("Placeholder") }' > app/src/main.rs && \
+    echo 'fn main() { println!("Placeholder") }' > worker/src/main.rs
 
 # Build dependencies
 RUN cargo build --release --package worker
