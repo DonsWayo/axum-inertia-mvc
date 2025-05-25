@@ -1,21 +1,42 @@
 use axum::{
-    Router,
-    routing::get,
+    extract::State,
     response::IntoResponse,
+    routing::get,
+    Router,
 };
-use axum_inertia::{Inertia, InertiaConfig};
+use axum_inertia::Inertia;
 use serde_json::json;
+use crate::db::DbPool;
+use crate::services::document_service::DocumentService;
 
-pub fn router() -> Router<InertiaConfig> {
+// We're using a generic parameter to allow the router to be merged with any state
+// that can provide both DbPool and InertiaConfig via FromRef
+pub fn router<S>() -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+    DbPool: axum::extract::FromRef<S>,
+    axum_inertia::InertiaConfig: axum::extract::FromRef<S>,
+{
     Router::new()
         .route("/", get(index))
 }
 
-async fn index(i: Inertia) -> impl IntoResponse {
-    i.render(
-        "Dashboard",
-        json!({
-            "message": "Welcome to Axum Inertia MVC with Views Structure",
-        }),
-    )
+async fn index(
+    State(pool): State<DbPool>,
+    inertia: Inertia,
+) -> impl IntoResponse {
+    // Use the document service instead of repository directly
+    let service = DocumentService::new(pool);
+    
+    // Get all documents from the database
+    let documents = match service.get_all().await {
+        Ok(docs) => docs,
+        Err(_) => vec![] // Return empty array if there's an error
+    };
+    
+    // Render the dashboard view with document data
+    inertia.render("Dashboard", json!({
+        "message": "Welcome to Axum Inertia MVC with PostgreSQL",
+        "documents": documents
+    }))
 }
