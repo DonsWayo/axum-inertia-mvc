@@ -2,6 +2,8 @@
 
 A modern Rust monorepo that combines Axum for API development with a background job processing system using graphile_worker.
 
+![Dashboard Screenshot](docs/images/dashboard.png)
+
 ## Project Structure
 
 This project is organized as a Rust workspace with multiple crates:
