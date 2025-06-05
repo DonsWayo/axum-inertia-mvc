@@ -1,0 +1,89 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE incidents\n            SET\n                title = COALESCE($2, title),\n                message = COALESCE($3, message),\n                severity = COALESCE($4, severity),\n                affected_monitors = COALESCE($5::INTEGER[], affected_monitors),\n                resolved_at = COALESCE($6, resolved_at),\n                is_resolved = COALESCE($7, is_resolved),\n                metadata = COALESCE($8, metadata),\n                updated_at = NOW()\n            WHERE id = $1\n            RETURNING id, title, message, severity, \n                affected_monitors as \"affected_monitors!: Vec<i32>\",\n                created_at, updated_at, started_at, resolved_at, \n                is_resolved, metadata\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "message",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "severity",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "affected_monitors!: Vec<i32>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "resolved_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "is_resolved",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Text",
+        "Varchar",
+        "Int4Array",
+        "Timestamptz",
+        "Bool",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "a7c86e315de08e47fcee98d04a8afa14bfa15b35d4227b76123bc59f764650a6"
+}

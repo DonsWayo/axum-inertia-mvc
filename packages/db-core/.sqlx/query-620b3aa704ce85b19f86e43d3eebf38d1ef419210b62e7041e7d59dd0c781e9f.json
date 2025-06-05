@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM monitors",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "620b3aa704ce85b19f86e43d3eebf38d1ef419210b62e7041e7d59dd0c781e9f"
+}
