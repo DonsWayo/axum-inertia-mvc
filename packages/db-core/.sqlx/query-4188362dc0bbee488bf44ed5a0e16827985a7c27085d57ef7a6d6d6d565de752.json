@@ -1,0 +1,97 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE monitors\n            SET \n                name = COALESCE($2, name),\n                display_name = COALESCE($3, display_name),\n                description = COALESCE($4, description),\n                url = COALESCE($5, url),\n                monitor_type = COALESCE($6, monitor_type),\n                check_interval = COALESCE($7, check_interval),\n                timeout = COALESCE($8, timeout),\n                is_active = COALESCE($9, is_active),\n                metadata = COALESCE($10, metadata)\n            WHERE id = $1\n            RETURNING *\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "display_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "monitor_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "check_interval",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "timeout",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Varchar",
+        "Text",
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int4",
+        "Bool",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "4188362dc0bbee488bf44ed5a0e16827985a7c27085d57ef7a6d6d6d565de752"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM incidents",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "40a21e5d01e284c318fad6ef6a02f8f9aa1fea5a020a7e518dea432dc40b8af6"
+}

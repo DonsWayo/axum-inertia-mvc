@@ -1,0 +1,87 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO incidents (\n                title, message, severity, affected_monitors, \n                started_at, metadata\n            )\n            VALUES ($1, $2, $3, $4::INTEGER[], $5, $6)\n            RETURNING id, title, message, severity, \n                affected_monitors as \"affected_monitors!: Vec<i32>\",\n                created_at, updated_at, started_at, resolved_at, \n                is_resolved, metadata\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "message",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "severity",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "affected_monitors!: Vec<i32>",
+        "type_info": "Int4Array"
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "resolved_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "is_resolved",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text",
+        "Varchar",
+        "Int4Array",
+        "Timestamptz",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "64489e7c9754567e9dd1ecf399fffe2846e98f2b3db0638452ddc61aa8070024"
+}
