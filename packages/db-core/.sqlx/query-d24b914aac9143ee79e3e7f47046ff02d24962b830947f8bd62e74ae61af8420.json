@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO monitors (name, display_name, url, monitor_type, check_interval, timeout, is_active, metadata)\n            VALUES ($1, $2, $3, $4, $5, $6, true, $7)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Int4",
+        "Int4",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d24b914aac9143ee79e3e7f47046ff02d24962b830947f8bd62e74ae61af8420"
+}

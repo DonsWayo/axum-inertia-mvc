@@ -1,0 +1,71 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT \n                bucket as \"bucket?\",\n                monitor_id as \"monitor_id?\",\n                check_count as \"check_count?\",\n                operational_count as \"operational_count?\",\n                incident_count as \"incident_count?\",\n                avg_response_time,\n                min_response_time,\n                max_response_time,\n                p95_response_time\n            FROM status_hourly_stats\n            WHERE monitor_id = $1 AND bucket >= $2\n            ORDER BY bucket DESC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "bucket?",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "monitor_id?",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "check_count?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "operational_count?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "incident_count?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "avg_response_time",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "min_response_time",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "max_response_time",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "p95_response_time",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "12c630cf66c9fbc58caf47689ad63283e9878a0e02bdf8895b6239f6e9dcb337"
+}
