@@ -1,7 +1,7 @@
 use crate::error::DbError;
 use crate::models::incident::{Incident, CreateIncident, UpdateIncident};
 use sqlx::PgPool;
-use chrono::Utc;
+use time::OffsetDateTime;
 
 pub struct IncidentRepository;
 
@@ -24,7 +24,7 @@ impl IncidentRepository {
             incident.message,
             incident.severity,
             &incident.affected_monitors[..],
-            incident.started_at.unwrap_or_else(Utc::now),
+            incident.started_at.unwrap_or_else(OffsetDateTime::now_utc),
             incident.metadata
         )
         .fetch_one(pool)

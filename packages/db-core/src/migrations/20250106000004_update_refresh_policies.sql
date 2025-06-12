@@ -13,6 +13,5 @@ SELECT add_continuous_aggregate_policy('status_daily_stats',
     end_offset => INTERVAL '1 minute',
     schedule_interval => INTERVAL '1 minute');
 
--- Force immediate refresh to sync data
-CALL refresh_continuous_aggregate('status_hourly_stats', NOW() - INTERVAL '1 day', NOW());
-CALL refresh_continuous_aggregate('status_daily_stats', NOW() - INTERVAL '1 day', NOW());
+-- Note: Continuous aggregates will refresh automatically based on the policies above
+-- Manual refresh using CALL cannot be done inside a migration transaction

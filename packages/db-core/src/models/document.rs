@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use chrono::{DateTime, Utc};
+use time::OffsetDateTime;
 
 /// Represents a document in the system
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
@@ -28,11 +28,11 @@ pub struct Document {
     
     /// When the document was created
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub created_at: Option<DateTime<Utc>>,
+    pub created_at: Option<OffsetDateTime>,
     
     /// When the document was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<DateTime<Utc>>,
+    pub updated_at: Option<OffsetDateTime>,
 }
 
 /// Used for creating a new document

@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use time::OffsetDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
@@ -9,10 +9,10 @@ pub struct Incident {
     pub message: String,
     pub severity: String,
     pub affected_monitors: Vec<i32>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub started_at: DateTime<Utc>,
-    pub resolved_at: Option<DateTime<Utc>>,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
+    pub started_at: OffsetDateTime,
+    pub resolved_at: Option<OffsetDateTime>,
     pub is_resolved: bool,
     pub metadata: Option<serde_json::Value>,
 }
@@ -23,7 +23,7 @@ pub struct CreateIncident {
     pub message: String,
     pub severity: String,
     pub affected_monitors: Vec<i32>,
-    pub started_at: Option<DateTime<Utc>>,
+    pub started_at: Option<OffsetDateTime>,
     pub metadata: Option<serde_json::Value>,
 }
 
@@ -33,7 +33,7 @@ pub struct UpdateIncident {
     pub message: Option<String>,
     pub severity: Option<String>,
     pub affected_monitors: Option<Vec<i32>>,
-    pub resolved_at: Option<DateTime<Utc>>,
+    pub resolved_at: Option<OffsetDateTime>,
     pub is_resolved: Option<bool>,
     pub metadata: Option<serde_json::Value>,
 }

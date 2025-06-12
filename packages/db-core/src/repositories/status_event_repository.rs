@@ -2,7 +2,7 @@ use crate::error::DbError;
 use crate::models::status_event::{
     CreateStatusEvent, MonitorStatusSummary, StatusDailyStat, StatusEvent, StatusHourlyStat,
 };
-use chrono::{DateTime, Duration, Utc};
+use time::{OffsetDateTime, Duration};
 use sqlx::PgPool;
 
 pub struct StatusEventRepository;
@@ -54,8 +54,8 @@ impl StatusEventRepository {
     pub async fn get_events_in_range(
         pool: &PgPool,
         monitor_id: i32,
-        start_time: DateTime<Utc>,
-        end_time: DateTime<Utc>,
+        start_time: OffsetDateTime,
+        end_time: OffsetDateTime,
     ) -> Result<Vec<StatusEvent>, DbError> {
         let results = sqlx::query_as!(
             StatusEvent,
@@ -99,7 +99,7 @@ impl StatusEventRepository {
         monitor_id: i32,
         hours: i32,
     ) -> Result<Vec<StatusHourlyStat>, DbError> {
-        let start_time = Utc::now() - Duration::hours(hours as i64);
+        let start_time = OffsetDateTime::now_utc() - Duration::hours(hours as i64);
         
         let results = sqlx::query_as!(
             StatusHourlyStat,
@@ -132,7 +132,7 @@ impl StatusEventRepository {
         monitor_id: i32,
         days: i32,
     ) -> Result<Vec<StatusDailyStat>, DbError> {
-        let start_time = Utc::now() - Duration::days(days as i64);
+        let start_time = OffsetDateTime::now_utc() - Duration::days(days as i64);
         
         let results = sqlx::query_as!(
             StatusDailyStat,
@@ -179,7 +179,7 @@ impl StatusEventRepository {
 
         let (current_status, last_check_time) = match latest_status {
             Some(row) => (row.status, row.last_check_time),
-            None => ("unknown".to_string(), Utc::now()),
+            None => ("unknown".to_string(), OffsetDateTime::now_utc()),
         };
 
         // Calculate uptime percentages
@@ -288,10 +288,10 @@ impl StatusEventRepository {
         pool: &PgPool,
         monitor_id: i32,
         days: i32,
-    ) -> Result<Vec<(DateTime<Utc>, String)>, DbError> {
-        let start_time = Utc::now() - Duration::days(days as i64);
+    ) -> Result<Vec<(OffsetDateTime, String)>, DbError> {
+        let start_time = OffsetDateTime::now_utc() - Duration::days(days as i64);
         
-        let results: Vec<(DateTime<Utc>, String)> = sqlx::query!(
+        let results: Vec<(OffsetDateTime, String)> = sqlx::query!(
             r#"
             WITH daily_status AS (
                 SELECT 

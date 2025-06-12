@@ -1,6 +1,6 @@
 use crate::{DbPool, DbError};
 use crate::models::document::{Document, CreateDocument, UpdateDocument};
-use chrono::Utc;
+use time::OffsetDateTime;
 
 /// Repository for document-related database operations
 pub struct DocumentRepository {
@@ -36,7 +36,7 @@ impl DocumentRepository {
     
     /// Create a new document
     pub async fn create(&self, document: CreateDocument) -> Result<Document, DbError> {
-        let now = Utc::now();
+        let now = OffsetDateTime::now_utc();
         
         sqlx::query_as::<_, Document>(
             "INSERT INTO documents (header, type_name, status, target, limit_value, reviewer, created_at, updated_at) 
@@ -65,7 +65,7 @@ impl DocumentRepository {
         }
         
         let existing = existing.unwrap();
-        let now = Utc::now();
+        let now = OffsetDateTime::now_utc();
         
         // Build the update query
         let updated_document = sqlx::query_as::<_, Document>(
