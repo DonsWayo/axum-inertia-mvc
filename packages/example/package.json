@@ -1,0 +1,17 @@
+{
+  "name": "@status-monitor/example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "heartbeat": "bun run src/heartbeat-demo.ts"
+  },
+  "dependencies": {
+    "@status-monitor/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@workspace/typescript-config": "workspace:*",
+    "bun-types": "latest"
+  }
+}
