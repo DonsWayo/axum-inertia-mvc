@@ -1,9 +1,10 @@
 [workspace]
 members = [
     "app",
-    "worker"
+    "worker",
+    "packages/db-core"
 ]
-resolver = "3"
+resolver = "2"
 
 [workspace.dependencies]
 axum = "0.8.4"
@@ -13,7 +14,7 @@ serde_json = "1.0.114"
 tokio = { version = "1.45.0", features = ["full"] }
 tower-http = { version = "0.5.2", features = ["fs", "trace"] }
 dotenv = "0.15.0"
-sqlx = { version = "0.8.3", features = ["runtime-tokio-rustls", "postgres", "macros", "time", "uuid", "json", "migrate"] }
+sqlx = { version = "0.8.3", features = ["runtime-tokio-rustls", "postgres", "macros", "uuid", "json", "migrate", "time"] }
 time = { version = "0.3.34", features = ["serde"] }
 uuid = { version = "1.7.0", features = ["v4", "serde"] }
 thiserror = "1.0.58"
@@ -22,6 +23,7 @@ tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 graphile_worker = "0.8.4"
 graphile_worker_migrations = "0.4.6"
 graphile_worker_task_handler = "0.5.4"
+chrono = { version = "0.4", features = ["serde"] }
 
 [workspace.dev-dependencies]
 cargo-watch = "8.5.2"

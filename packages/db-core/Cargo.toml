@@ -5,12 +5,18 @@ edition = "2021"
 
 [dependencies]
 sqlx = { workspace = true }
-chrono = { version = "0.4", features = ["serde"] }
+time = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 dotenv = { workspace = true }
 tracing = { workspace = true }
+url = "2.5"
+tokio = { workspace = true }
+
+[[bin]]
+name = "reset_db"
+path = "src/bin/reset_db.rs"
 
 [features]
 default = ["runtime-tokio-rustls"]
