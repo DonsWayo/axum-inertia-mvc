@@ -1,4 +1,4 @@
-use axum::{Router, extract::{Extension, FromRef}};
+use axum::{Router, extract::FromRef};
 use axum_inertia::{vite, InertiaConfig};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -6,19 +6,18 @@ use tower_http::services::ServeDir;
 use std::sync::Arc;
 
 mod routes;
-mod db;
 mod services;
 
 // Define a combined application state
 #[derive(Clone)]
 struct AppState {
-    db_pool: db::DbPool,
+    db_pool: db_core::DbPool,
     inertia: InertiaConfig,
     worker_service: Arc<services::worker::WorkerService>,
 }
 
 // Implement FromRef for DbPool
-impl FromRef<AppState> for db::DbPool {
+impl FromRef<AppState> for db_core::DbPool {
     fn from_ref(state: &AppState) -> Self {
         state.db_pool.clone()
     }
@@ -34,10 +33,10 @@ impl FromRef<AppState> for InertiaConfig {
 #[tokio::main]
 async fn main() {
     // Initialize database connection pool
-    let db_pool = db::init_db_pool().await.expect("Failed to initialize database pool");
+    let db_pool = db_core::init_pool().await.expect("Failed to initialize database pool");
     
     // Run seeds before starting the server
-    db::seeds::runner::run_all_seeds(db_pool.clone()).await.expect("Failed to run seeds");
+    db_core::seeds::run_all_seeds(db_pool.clone()).await.expect("Failed to run seeds");
     
     // Initialize worker service
     let worker_service = services::worker::WorkerService::new(db_pool.clone())
@@ -68,6 +67,7 @@ async fn main() {
         )
         .merge(routes::home::router())
         .merge(routes::jobs::router())
+        .merge(routes::status::router())
         .with_state(app_state);
 
     // Start server

@@ -2,18 +2,40 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post, put, delete},
+    routing::{get, post, put},
     Json, Router,
 };
 use axum_inertia::Inertia;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
-use chrono::Utc;
+use time::OffsetDateTime;
 use db_core::DbPool;
 use db_core::models::monitor::{CreateMonitor, UpdateMonitor};
-use db_core::models::status_event::CreateStatusEvent;
-use db_core::models::incident::{Incident, CreateIncident, UpdateIncident};
+use db_core::models::status_event::{CreateStatusEvent, StatusType};
+use db_core::models::incident::{CreateIncident, UpdateIncident};
 use db_core::repositories::IncidentRepository;
 use crate::services::monitor_service::MonitorService;
+
+#[derive(Debug, Deserialize)]
+struct HeartbeatRequest {
+    timestamp: String,
+    metadata: Option<serde_json::Value>,
+    stats: Option<HeartbeatStats>,
+}
+
+#[derive(Debug, Deserialize)]
+struct HeartbeatStats {
+    sent: u64,
+    failed: u64,
+    uptime: u64,
+}
+
+#[derive(Debug, Serialize)]
+struct HeartbeatResponse {
+    success: bool,
+    timestamp: String,
+    message: Option<String>,
+}
 
 pub fn router<S>() -> Router<S>
 where
@@ -22,10 +44,11 @@ where
     axum_inertia::InertiaConfig: axum::extract::FromRef<S>,
 {
     Router::new()
-        .route("/", get(status_page))
+        .route("/status", get(status_page))
         .route("/api/monitors", get(list_monitors).post(create_monitor))
         .route("/api/monitors/{id}", get(get_monitor).put(update_monitor).delete(delete_monitor))
         .route("/api/monitors/{id}/events", post(record_event))
+        .route("/api/heartbeat/{monitor_id}", post(receive_heartbeat))
         .route("/api/incidents", get(list_incidents).post(create_incident))
         .route("/api/incidents/{id}", put(update_incident).delete(delete_incident))
 }
@@ -43,7 +66,7 @@ async fn status_page(
         Err(_) => inertia.render("EnhancedStatusPage", json!({
             "statusData": {
                 "all_operational": true,
-                "last_updated": Utc::now(),
+                "last_updated": OffsetDateTime::now_utc(),
                 "monitors": [],
                 "incidents": []
             }
@@ -147,5 +170,50 @@ async fn delete_incident(
     match IncidentRepository::delete(&pool, id).await {
         Ok(_) => StatusCode::NO_CONTENT.into_response(),
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+    }
+}
+
+async fn receive_heartbeat(
+    State(pool): State<DbPool>,
+    Path(monitor_id): Path<String>,
+    Json(heartbeat): Json<HeartbeatRequest>,
+) -> impl IntoResponse {
+    // Parse monitor ID
+    let monitor_id = match monitor_id.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => {
+            return Json(HeartbeatResponse {
+                success: false,
+                timestamp: OffsetDateTime::now_utc().to_string(),
+                message: Some("Invalid monitor ID".to_string()),
+            }).into_response();
+        }
+    };
+
+    // Record the heartbeat as a status event
+    let event = CreateStatusEvent {
+        monitor_id,
+        status: StatusType::Operational.into(),
+        response_time: Some(1), // Heartbeats are always "1ms" since they're internal
+        status_code: Some(200), // Heartbeats are successful
+        error_message: Some("Heartbeat received".to_string()),
+        metadata: heartbeat.metadata,
+    };
+
+    match MonitorService::record_status_event(&pool, event).await {
+        Ok(_) => {
+            Json(HeartbeatResponse {
+                success: true,
+                timestamp: OffsetDateTime::now_utc().to_string(),
+                message: Some("Heartbeat recorded successfully".to_string()),
+            }).into_response()
+        }
+        Err(e) => {
+            Json(HeartbeatResponse {
+                success: false,
+                timestamp: OffsetDateTime::now_utc().to_string(),
+                message: Some(format!("Failed to record heartbeat: {}", e)),
+            }).into_response()
+        }
     }
 }

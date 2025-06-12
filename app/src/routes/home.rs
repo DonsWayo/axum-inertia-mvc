@@ -6,7 +6,7 @@ use axum::{
 };
 use axum_inertia::Inertia;
 use serde_json::json;
-use crate::db::DbPool;
+use db_core::DbPool;
 use crate::services::document_service::DocumentService;
 
 // We're using a generic parameter to allow the router to be merged with any state

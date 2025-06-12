@@ -5,10 +5,27 @@ use db_core::models::status_event::{
 };
 use db_core::models::incident::Incident;
 use db_core::repositories::{MonitorRepository, StatusEventRepository, IncidentRepository};
-use chrono::{DateTime, Utc};
+use time::OffsetDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tracing::debug;
+
+fn month_name(month: time::Month) -> &'static str {
+    match month {
+        time::Month::January => "Jan",
+        time::Month::February => "Feb", 
+        time::Month::March => "Mar",
+        time::Month::April => "Apr",
+        time::Month::May => "May",
+        time::Month::June => "Jun",
+        time::Month::July => "Jul",
+        time::Month::August => "Aug",
+        time::Month::September => "Sep",
+        time::Month::October => "Oct",
+        time::Month::November => "Nov",
+        time::Month::December => "Dec",
+    }
+}
 
 pub struct MonitorService;
 
@@ -16,7 +33,7 @@ pub struct MonitorService;
 pub struct MonitorWithStatus {
     pub monitor: Monitor,
     pub current_status: String,
-    pub last_check_time: Option<DateTime<Utc>>,
+    pub last_check_time: Option<OffsetDateTime>,
     pub uptime_percentage: f64,
     pub daily_stats: Vec<StatusDailyStat>,
 }
@@ -32,7 +49,7 @@ pub struct ServiceGroup {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StatusPageData {
     pub all_operational: bool,
-    pub last_updated: DateTime<Utc>,
+    pub last_updated: OffsetDateTime,
     pub monitors: Vec<MonitorWithStatus>,
     pub incidents: Vec<Incident>,
 }
@@ -119,7 +136,7 @@ impl MonitorService {
 
         Ok(StatusPageData {
             all_operational,
-            last_updated: Utc::now(),
+            last_updated: OffsetDateTime::now_utc(),
             monitors: monitors_with_status,
             incidents,
         })
@@ -151,7 +168,7 @@ impl MonitorService {
                 };
 
                 TrackerDataPoint {
-                    date: date.format("%d %b, %Y").to_string(),
+                    date: format!("{:02} {}, {}", date.day(), month_name(date.month()), date.year()),
                     tooltip: tooltip.to_string(),
                     status,
                 }
