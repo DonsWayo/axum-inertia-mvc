@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+db-core = { path = "../packages/db-core" }
 graphile_worker = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
@@ -15,6 +16,8 @@ tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
 thiserror = { workspace = true }
 time = { workspace = true }
+reqwest = { workspace = true }
+chrono = { workspace = true }
 
 [dev-dependencies]
 cargo-watch = "8.5.2"

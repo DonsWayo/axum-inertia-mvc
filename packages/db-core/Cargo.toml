@@ -18,6 +18,10 @@ tokio = { workspace = true }
 name = "reset_db"
 path = "src/bin/reset_db.rs"
 
+[[bin]]
+name = "seed_db"
+path = "src/bin/seed_db.rs"
+
 [features]
 default = ["runtime-tokio-rustls"]
 runtime-tokio-rustls = ["sqlx/runtime-tokio-rustls"]
