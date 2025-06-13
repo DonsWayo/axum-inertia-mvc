@@ -15,7 +15,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY app/Cargo.toml ./app/
 
 # Build dependencies
-RUN cargo build --release --package axum-inertia-mvc
+RUN cargo build --release --package rustgenie
 
 # Copy the frontend files
 COPY app/package.json ./app/
@@ -38,7 +38,7 @@ RUN npm run build
 
 # Build the application
 WORKDIR /app
-RUN cargo build --release --package axum-inertia-mvc
+RUN cargo build --release --package rustgenie
 
 # Runtime stage
 FROM debian:bookworm-slim
@@ -51,8 +51,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the binary and assets from the builder stage
-COPY --from=builder /app/target/release/axum-inertia-mvc /app/axum-inertia-mvc
+COPY --from=builder /app/target/release/rustgenie /app/rustgenie
 COPY --from=builder /app/app/dist /app/dist
 
 # Set the entrypoint
-ENTRYPOINT ["/app/axum-inertia-mvc"]
+ENTRYPOINT ["/app/rustgenie"]

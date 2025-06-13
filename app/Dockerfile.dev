@@ -43,4 +43,4 @@ VOLUME ["/app/app/src"]
 EXPOSE 8000 3000
 
 # Start the development server with live reload
-CMD ["sh", "-c", "cd /app/app && npm run dev & cd /app && cargo watch -x 'run --bin axum-inertia-mvc' -w app/src -i app/src/views"]
+CMD ["sh", "-c", "cd /app/app && npm run dev & cd /app && cargo watch -x 'run --bin rustgenie' -w app/src -i app/src/views"]

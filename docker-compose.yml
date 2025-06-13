@@ -1,4 +1,4 @@
-name: axum-inertia-mvc
+name: rustgenie
 services:
   # Database
   db:
@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: axum_inertia_mvc
+      POSTGRES_DB: rustgenie
     ports:
       - "5432:5432"
     volumes:
@@ -21,7 +21,7 @@ services:
   vectorizer-worker:
     image: timescale/pgai-vectorizer-worker:latest
     environment:
-      PGAI_VECTORIZER_WORKER_DB_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      PGAI_VECTORIZER_WORKER_DB_URL: postgres://postgres:postgres@db:5432/rustgenie
     command: [ "--poll-interval", "5s", "--log-level", "DEBUG" ]
     depends_on:
       db:
@@ -71,7 +71,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      DATABASE_URL: postgres://postgres:postgres@db:5432/rustgenie
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
       OLLAMA_API_URL: http://ollama:11434
@@ -91,7 +91,7 @@ services:
       context: .
       dockerfile: worker/Dockerfile
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      DATABASE_URL: postgres://postgres:postgres@db:5432/rustgenie
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
       OLLAMA_API_URL: http://ollama:11434
@@ -115,7 +115,7 @@ services:
       - "8000:8000"  # App server
       - "3000:3000"  # Vite dev server
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/axum_inertia_mvc
+      DATABASE_URL: postgres://postgres:postgres@db:5432/rustgenie
       SMTP_HOST: mailhog
       SMTP_PORT: 1025
       OLLAMA_API_URL: http://ollama:11434
