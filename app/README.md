@@ -1,4 +1,4 @@
-# Axum Inertia MVC - Web Application
+# RustGenie - Web Application
 
 A modern web application built with Axum, Inertia.js, React, and TailwindCSS, with background job processing capabilities.
 
@@ -56,7 +56,7 @@ cp .env.example .env
 
 ```bash
 # Create a PostgreSQL database
-psql -U postgres -c "CREATE DATABASE axum_inertia_mvc;"
+psql -U postgres -c "CREATE DATABASE rustgenie;"
 
 # Copy the example environment file and update with your database credentials
 cp .env.example .env
@@ -113,7 +113,7 @@ cargo build --release
 ### 3. Run the production server
 
 ```bash
-./target/release/axum-inertia-mvc
+./target/release/rustgenie
 ```
 
 ## Features

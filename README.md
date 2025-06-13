@@ -1,4 +1,4 @@
-# Axum Inertia MVC with Background Worker
+# RustGenie - Full-Stack Rust Application
 
 A modern Rust monorepo that combines Axum for API development with a background job processing system using graphile_worker.
 
@@ -34,7 +34,7 @@ This project is organized as a Rust workspace with multiple crates:
 Create a `.env` file in the project root with the following variables:
 
 ```
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/axum_inertia_mvc
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/rustgenie
 ```
 
 ## Quick Start
@@ -42,7 +42,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/axum_inertia_mvc
 1. **Setup the database**:
 
 ```bash
-psql -c "CREATE DATABASE axum_inertia_mvc"
+psql -c "CREATE DATABASE rustgenie"
 ```
 
 2. **Run the worker**:
@@ -54,7 +54,7 @@ cargo run --bin worker
 3. **Run the web application**:
 
 ```bash
-cargo run --bin axum-inertia-mvc
+cargo run --bin rustgenie
 ```
 
 ## Testing the Job Queue
@@ -87,7 +87,7 @@ Once inside the container, you can run the app and worker with live reload:
 
 ```bash
 # In one terminal (inside the container)
-cd /app && cargo watch -x 'run --bin axum-inertia-mvc' -w app/src -i app/src/views
+cd /app && cargo watch -x 'run --bin rustgenie' -w app/src -i app/src/views
 
 # In another terminal (inside the container)
 cd /app && cargo watch -x 'run --bin worker' -w worker/src

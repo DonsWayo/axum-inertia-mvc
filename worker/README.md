@@ -1,6 +1,6 @@
-# Axum Inertia MVC - Background Worker
+# RustGenie - Background Worker
 
-A robust background job processing service built with Rust and graphile_worker, designed to work with the Axum Inertia MVC web application.
+A robust background job processing service built with Rust and graphile_worker, designed to work with the RustGenie web application.
 
 ## Overview
 
@@ -25,7 +25,7 @@ This worker service processes background jobs queued by the main web application
 Create a `.env` file in the project root with the following variables:
 
 ```
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/axum_inertia_mvc
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/rustgenie
 ```
 
 ## Running the Worker
