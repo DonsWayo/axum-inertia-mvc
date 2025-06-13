@@ -36,7 +36,7 @@ async fn index(
     
     // Render the dashboard view with document data
     inertia.render("Dashboard", json!({
-        "message": "Welcome to Axum Inertia MVC with PostgreSQL",
+        "message": "Welcome to RustGenie - Your Full-Stack Rust Application",
         "documents": documents
     }))
 }

@@ -3,6 +3,7 @@ use graphile_worker::WorkerOptions;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use std::error::Error;
+use std::sync::Arc;
 use tracing::info;
 use tracing_subscriber::fmt::format::FmtSpan;
 
@@ -33,10 +34,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut options = WorkerOptions::default()
         .concurrency(5)
         .schema("graphile_worker")
-        .pg_pool(pool);
+        .pg_pool(pool.clone());
         
     // Register all tasks
     options = tasks::register_tasks(options);
+    
+    // Convert sqlx pool to db_core pool and add to worker context
+    let db_pool: db_core::DbPool = Arc::new(pool.clone());
+    options = options.add_extension(db_pool);
     
     // Initialize the worker
     let worker = options.init().await?;
@@ -56,6 +61,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     .await?;
 
     info!("Added test email job");
+
+    // Schedule initial monitor checks
+    let db_pool: db_core::DbPool = Arc::new(pool);
+    if let Err(e) = tasks::schedule_monitors::schedule_monitors_periodically(db_pool, &utils).await {
+        tracing::error!("Failed to schedule initial monitor checks: {}", e);
+    }
 
     // Run the worker
     worker.run().await?;

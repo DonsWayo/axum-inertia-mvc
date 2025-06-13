@@ -35,9 +35,6 @@ async fn main() {
     // Initialize database connection pool
     let db_pool = db_core::init_pool().await.expect("Failed to initialize database pool");
     
-    // Run seeds before starting the server
-    db_core::seeds::run_all_seeds(db_pool.clone()).await.expect("Failed to run seeds");
-    
     // Initialize worker service
     let worker_service = services::worker::WorkerService::new(db_pool.clone())
         .await
@@ -48,7 +45,7 @@ async fn main() {
         .port(5173)
         .main("src/main.tsx")
         .lang("en")
-        .title("Axum Inertia MVC")
+        .title("RustGenie")
         .react()
         .into_config();
 

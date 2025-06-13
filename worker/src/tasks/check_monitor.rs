@@ -57,7 +57,7 @@ impl TaskHandler for CheckMonitor {
         
         // Record the status event
         let (status, response_time) = match &check_result {
-            Ok((status, response_time, status_code)) => {
+            Ok((status, response_time, _status_code)) => {
                 info!("Monitor {} check succeeded: status={}, response_time={}ms", 
                     self.monitor_id, status, response_time);
                 (status.clone(), Some(*response_time as i32))
