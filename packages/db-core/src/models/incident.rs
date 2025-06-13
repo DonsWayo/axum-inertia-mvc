@@ -9,9 +9,13 @@ pub struct Incident {
     pub message: String,
     pub severity: String,
     pub affected_monitors: Vec<i32>,
+    #[serde(with = "crate::time_serde")]
     pub created_at: OffsetDateTime,
+    #[serde(with = "crate::time_serde")]
     pub updated_at: OffsetDateTime,
+    #[serde(with = "crate::time_serde")]
     pub started_at: OffsetDateTime,
+    #[serde(with = "crate::time_serde::option")]
     pub resolved_at: Option<OffsetDateTime>,
     pub is_resolved: bool,
     pub metadata: Option<serde_json::Value>,

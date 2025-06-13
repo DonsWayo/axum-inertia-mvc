@@ -15,7 +15,9 @@ pub struct Monitor {
     pub timeout: i32,
     pub is_active: bool,
     pub metadata: Option<JsonValue>,
+    #[serde(with = "crate::time_serde")]
     pub created_at: OffsetDateTime,
+    #[serde(with = "crate::time_serde")]
     pub updated_at: OffsetDateTime,
 }
 

@@ -1,6 +1,6 @@
 use graphile_worker::{WorkerOptions, WorkerUtils, Job};
 use serde_json::Value;
-use sqlx::PgPool;
+use db_core::DbPool;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::info;
@@ -19,7 +19,7 @@ pub struct WorkerService {
 }
 
 impl WorkerService {
-    pub async fn new(pool: Arc<PgPool>) -> Result<Self, WorkerError> {
+    pub async fn new(pool: DbPool) -> Result<Self, WorkerError> {
         // Initialize a worker with minimal configuration just to get the utils
         let worker = WorkerOptions::default()
             .schema("graphile_worker")

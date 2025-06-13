@@ -9,13 +9,13 @@ pub async fn seed_monitors(pool: &PgPool) -> Result<(), DbError> {
     sqlx::query!("DELETE FROM monitors").execute(pool).await?;
     sqlx::query!("DELETE FROM incidents").execute(pool).await?;
     
-    // Seed CRM Application monitors
+    // Seed CRM Application monitors with a mix of working and failing services
     let crm_monitors = vec![
-        // CRM Frontend
+        // CRM Frontend - Working
         (
             "crm-web",
             "CRM Web Application",
-            "https://crm.conek.cloud",
+            "https://httpbin.org/status/200",
             "http",
             60, // check every minute
             30, // 30 second timeout
@@ -27,11 +27,11 @@ pub async fn seed_monitors(pool: &PgPool) -> Result<(), DbError> {
                 "check_ssl": true
             })
         ),
-        // CRM Backend API
+        // CRM Backend API - Will fail (404)
         (
             "crm-backend",
             "CRM Backend API",
-            "https://crm-backend.conek.cloud",
+            "https://httpbin.org/status/404",
             "http",
             30, // check every 30 seconds
             10, // 10 second timeout
@@ -44,7 +44,39 @@ pub async fn seed_monitors(pool: &PgPool) -> Result<(), DbError> {
                 "expected_response": {"status": "healthy"}
             })
         ),
-        // Random test monitor
+        // Database Monitor - Will fail intermittently (50% chance)
+        (
+            "crm-database",
+            "CRM Database",
+            "https://httpbin.org/status/200,500",
+            "http",
+            45, // check every 45 seconds
+            10, // 10 second timeout
+            json!({
+                "service_group": "CRM Application",
+                "service_category": "database",
+                "priority": 1,
+                "expected_status_code": 200,
+                "description": "PostgreSQL database (simulated with 50% failure rate)"
+            })
+        ),
+        // Redis Cache - Working but slow (simulated degraded performance)
+        (
+            "crm-redis",
+            "CRM Redis Cache",
+            "https://httpbin.org/delay/4",
+            "http",
+            60, // check every minute
+            10, // 10 second timeout
+            json!({
+                "service_group": "CRM Application",
+                "service_category": "cache",
+                "priority": 2,
+                "expected_status_code": 200,
+                "description": "Redis cache (simulated slow response)"
+            })
+        ),
+        // Random test monitor - Working
         (
             "test-api",
             "Test API Service",
@@ -58,6 +90,22 @@ pub async fn seed_monitors(pool: &PgPool) -> Result<(), DbError> {
                 "priority": 3,
                 "expected_status_code": 200,
                 "description": "Test monitor for a public API"
+            })
+        ),
+        // External Service - Will timeout
+        (
+            "external-api",
+            "External Payment API",
+            "https://httpbin.org/delay/15",
+            "http",
+            90, // check every 90 seconds
+            5, // 5 second timeout (will timeout since delay is 15s)
+            json!({
+                "service_group": "External Services",
+                "service_category": "payment",
+                "priority": 1,
+                "expected_status_code": 200,
+                "description": "External payment provider (simulated timeout)"
             })
         )
     ];
@@ -85,31 +133,47 @@ pub async fn seed_monitors(pool: &PgPool) -> Result<(), DbError> {
         .await?;
     }
     
+    // Note: We'll fetch the actual monitor IDs after creation
+    let db_monitor_id = sqlx::query!("SELECT id FROM monitors WHERE name = 'crm-database'")
+        .fetch_optional(pool)
+        .await?
+        .map(|r| r.id);
+        
+    let redis_monitor_id = sqlx::query!("SELECT id FROM monitors WHERE name = 'crm-redis'")
+        .fetch_optional(pool)
+        .await?
+        .map(|r| r.id);
+    
     // Seed some sample incidents
-    let incidents = vec![
-        (
+    let mut incidents = vec![];
+    
+    if let Some(db_id) = db_monitor_id {
+        incidents.push((
             "Scheduled Database Maintenance",
             "We will be performing database maintenance on CRM PostgreSQL. The service may experience brief interruptions.",
             "warning",
-            vec![4], // CRM Database monitor ID (adjust based on actual IDs)
+            vec![db_id],
             false,
             json!({
                 "scheduled": true,
                 "estimated_duration": "2 hours"
             })
-        ),
-        (
+        ));
+    }
+    
+    if let Some(redis_id) = redis_monitor_id {
+        incidents.push((
             "Redis Performance Degradation",
             "We are investigating slow response times from the Redis cache. This may cause slower page loads.",
             "warning",
-            vec![5], // CRM Redis monitor ID
+            vec![redis_id],
             false,
             json!({
                 "impact": "minor",
                 "team": "infrastructure"
             })
-        ),
-    ];
+        ));
+    }
     
     for (title, message, severity, affected_monitors, is_resolved, metadata) in incidents {
         sqlx::query!(

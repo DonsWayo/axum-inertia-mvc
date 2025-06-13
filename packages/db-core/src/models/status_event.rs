@@ -5,6 +5,7 @@ use sqlx::FromRow;
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct StatusEvent {
+    #[serde(with = "crate::time_serde")]
     pub time: OffsetDateTime,
     pub monitor_id: i32,
     pub status: String,
@@ -12,6 +13,7 @@ pub struct StatusEvent {
     pub status_code: Option<i32>,
     pub error_message: Option<String>,
     pub metadata: Option<JsonValue>,
+    #[serde(with = "crate::time_serde")]
     pub created_at: OffsetDateTime,
 }
 
@@ -63,6 +65,7 @@ impl From<StatusType> for String {
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct StatusHourlyStat {
+    #[serde(with = "crate::time_serde::option")]
     pub bucket: Option<OffsetDateTime>,
     pub monitor_id: Option<i32>,
     pub check_count: Option<i64>,
@@ -76,6 +79,7 @@ pub struct StatusHourlyStat {
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct StatusDailyStat {
+    #[serde(with = "crate::time_serde::option")]
     pub bucket: Option<OffsetDateTime>,
     pub monitor_id: Option<i32>,
     pub check_count: Option<i64>,
@@ -90,6 +94,7 @@ pub struct StatusDailyStat {
 pub struct MonitorStatusSummary {
     pub monitor_id: i32,
     pub current_status: String,
+    #[serde(with = "crate::time_serde")]
     pub last_check_time: OffsetDateTime,
     pub uptime_24h: f64,
     pub uptime_7d: f64,

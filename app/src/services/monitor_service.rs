@@ -7,7 +7,7 @@ use db_core::models::incident::Incident;
 use db_core::repositories::{MonitorRepository, StatusEventRepository, IncidentRepository};
 use time::OffsetDateTime;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use db_core::DbPool;
 use tracing::debug;
 
 fn month_name(month: time::Month) -> &'static str {
@@ -33,6 +33,7 @@ pub struct MonitorService;
 pub struct MonitorWithStatus {
     pub monitor: Monitor,
     pub current_status: String,
+    #[serde(with = "db_core::time_serde::option")]
     pub last_check_time: Option<OffsetDateTime>,
     pub uptime_percentage: f64,
     pub daily_stats: Vec<StatusDailyStat>,
@@ -49,6 +50,7 @@ pub struct ServiceGroup {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StatusPageData {
     pub all_operational: bool,
+    #[serde(with = "db_core::time_serde")]
     pub last_updated: OffsetDateTime,
     pub monitors: Vec<MonitorWithStatus>,
     pub incidents: Vec<Incident>,
@@ -71,36 +73,36 @@ pub struct TrackerDataPoint {
 
 impl MonitorService {
     pub async fn create_monitor(
-        pool: &PgPool,
+        pool: &DbPool,
         monitor: CreateMonitor,
     ) -> Result<Monitor, DbError> {
         MonitorRepository::create(pool, monitor).await
     }
 
-    pub async fn get_monitor(pool: &PgPool, id: i32) -> Result<Option<Monitor>, DbError> {
+    pub async fn get_monitor(pool: &DbPool, id: i32) -> Result<Option<Monitor>, DbError> {
         MonitorRepository::find_by_id(pool, id).await
     }
 
     pub async fn update_monitor(
-        pool: &PgPool,
+        pool: &DbPool,
         id: i32,
         monitor: UpdateMonitor,
     ) -> Result<Monitor, DbError> {
         MonitorRepository::update(pool, id, monitor).await
     }
 
-    pub async fn delete_monitor(pool: &PgPool, id: i32) -> Result<(), DbError> {
+    pub async fn delete_monitor(pool: &DbPool, id: i32) -> Result<(), DbError> {
         MonitorRepository::delete(pool, id).await
     }
 
     pub async fn record_status_event(
-        pool: &PgPool,
+        pool: &DbPool,
         event: CreateStatusEvent,
     ) -> Result<StatusEvent, DbError> {
         StatusEventRepository::create(pool, event).await
     }
 
-    pub async fn get_status_page_data(pool: &PgPool) -> Result<StatusPageData, DbError> {
+    pub async fn get_status_page_data(pool: &DbPool) -> Result<StatusPageData, DbError> {
         let monitors = MonitorRepository::list_active(pool).await?;
         let incidents = IncidentRepository::list_active(pool).await?;
         let mut monitors_with_status = Vec::new();
@@ -143,7 +145,7 @@ impl MonitorService {
     }
 
     pub async fn get_monitor_detail(
-        pool: &PgPool,
+        pool: &DbPool,
         monitor_id: i32,
     ) -> Result<Option<MonitorDetailData>, DbError> {
         let monitor = match MonitorRepository::find_by_id(pool, monitor_id).await? {
@@ -183,7 +185,7 @@ impl MonitorService {
         }))
     }
 
-    pub async fn get_all_monitors(pool: &PgPool) -> Result<Vec<Monitor>, DbError> {
+    pub async fn get_all_monitors(pool: &DbPool) -> Result<Vec<Monitor>, DbError> {
         MonitorRepository::list_all(pool).await
     }
 }
