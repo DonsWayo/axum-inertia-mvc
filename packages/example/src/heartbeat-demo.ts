@@ -1,6 +1,6 @@
-import { createHeartbeatClient } from '@status-monitor/sdk';
+import { createHeartbeatClient } from '@rustgenie/sdk';
 
-console.log('Starting Status Monitor SDK Demo with Bun');
+console.log('Starting RustGenie SDK Demo with Bun');
 
 // Create a heartbeat client
 const client = createHeartbeatClient({
