@@ -20,6 +20,14 @@ tracing-subscriber = { workspace = true }
 graphile_worker = { workspace = true }
 chrono = { workspace = true }
 db-core = { path = "../packages/db-core" }
+axum-oidc = "0.6.0"
+reqwest = { version = "0.12.20" }
+axum-extra = { version = "0.10.0" }
+tower = { version = "0.5" }
+tower-sessions = "0.14.0"
+tower-sessions-sqlx-store = { version = "0.15.0", features = ["postgres"] }
+rand = "0.8"
+base64 = "0.22"
 
 [dev-dependencies]
 cargo-watch = "8.5.2"
