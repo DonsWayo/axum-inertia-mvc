@@ -72,6 +72,7 @@ async fn main() {
         )
         .merge(routes::home::router())
         .merge(routes::jobs::router())
+        .merge(routes::monitors::router())
         .merge(routes::status::router())
         .merge(auth_middleware_router)
         .with_state(app_state);
