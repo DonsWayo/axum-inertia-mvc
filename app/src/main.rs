@@ -60,7 +60,7 @@ async fn main() {
     };
 
     // Create auth router with all middleware built-in
-    let auth_middleware_router = routes::auth::create_auth_router()
+    let auth_middleware_router = routes::auth::create_auth_router::<AppState>()
         .await
         .expect("Failed to create auth router");
     
@@ -73,8 +73,7 @@ async fn main() {
         .merge(routes::home::router())
         .merge(routes::jobs::router())
         .merge(routes::status::router())
-        .merge(routes::auth::router())
-        .merge(auth_middleware_router.with_state(()))
+        .merge(auth_middleware_router)
         .with_state(app_state);
 
     // Start server
